@@ -1,8 +1,14 @@
 import * as React from "react";
-import {v4 as uuid} from 'uuid';
+import { v4 as uuid } from 'uuid';
+
+type Todo = {
+    id: string;
+    text: string;
+    completed: boolean;
+};
 
 export class TodoApp extends React.Component<any, any> {
-    collection = [];
+    todoList:Todo[] = [];
     inputData = '';
     inputUpdateData = '';
     counter = 0;
@@ -14,8 +20,8 @@ export class TodoApp extends React.Component<any, any> {
         fetch('http://localhost:3000/api/todos/')
             .then(response => response.json())
             .then(data => {
-                this.collection = data;
-                for (let i = 0; i < this.collection.length; i++) {
+                this.todoList = data;
+                for (let i = 0; i < this.todoList.length; i++) {
                     this.updating.push(false);
                 }
                 this.forceUpdate();
@@ -55,8 +61,8 @@ export class TodoApp extends React.Component<any, any> {
             if (!foundForbiddenWord) {
                 // Validación de texto repetido
                 let isRepeated = false;
-                for (let i = 0; i < this.collection.length; i++) {
-                    if (this.collection[i].text === this.inputData) {
+                for (let i = 0; i < this.todoList.length; i++) {
+                    if (this.todoList[i].text === this.inputData) {
                         isRepeated = true;
                         break;
                     }
@@ -73,7 +79,7 @@ export class TodoApp extends React.Component<any, any> {
                     })
                         .then(response => response.json())
                         .then(data => {
-                            this.collection.push(data);
+                            this.todoList.push(data);
                             this.inputData = '';
                             this.forceUpdate();
                         });
@@ -107,8 +113,8 @@ export class TodoApp extends React.Component<any, any> {
             if (!temp1) {
                 // Validación de texto repetido (excluyendo el índice actual)
                 let temp2 = false;
-                for (let i = 0; i < this.collection.length; i++) {
-                    if (i !== index && this.collection[i].text === this.inputUpdateData) {
+                for (let i = 0; i < this.todoList.length; i++) {
+                    if (i !== index && this.todoList[i].text === this.inputUpdateData) {
                         temp2 = true;
                         break;
                     }
@@ -118,14 +124,14 @@ export class TodoApp extends React.Component<any, any> {
                     alert('Error: The todo text is already in the collection.');
                 } else {
                     // Si pasa todas las validaciones, actualizar el "todo"
-                    fetch(`http://localhost:3000/api/todos/${this.collection[index].id}`, {
+                    fetch(`http://localhost:3000/api/todos/${this.todoList[index].id}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ text: this.inputUpdateData, completed: this.collection[index].completed }),
+                        body: JSON.stringify({ text: this.inputUpdateData, completed: this.todoList[index].completed }),
                     })
                         .then(response => response.json())
                         .then(data => {
-                            this.collection[index] = data;
+                            this.todoList[index] = data;
                             this.close(index);
                             this.forceUpdate();
                         });
@@ -141,27 +147,27 @@ export class TodoApp extends React.Component<any, any> {
     }
 
     deleteTodo(index) {
-        fetch(`http://localhost:3000/api/todos/${this.collection[index].id}`, { method: 'DELETE' })
+        fetch(`http://localhost:3000/api/todos/${this.todoList[index].id}`, { method: 'DELETE' })
             .then(() => {
-                if (this.collection[index].completed) {
+                if (this.todoList[index].completed) {
                     this.counter--;
                 }
-                this.collection.splice(index, 1);
+                this.todoList.splice(index, 1);
                 this.forceUpdate();
             })
     }
 
     toggleComplete(index) {
-        this.collection[index].completed = !this.collection[index].completed;
-        fetch(`http://localhost:3000/api/todos/${this.collection[index].id}`, {
+        this.todoList[index].completed = !this.todoList[index].completed;
+        fetch(`http://localhost:3000/api/todos/${this.todoList[index].id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ completed: this.collection[index].completed }),
+            body: JSON.stringify({ completed: this.todoList[index].completed }),
         })
             .then(response => response.json())
             .then(data => {
                 // this.collection[index] = data;
-                this.collection[index].completed ? this.counter++ : this.counter--;
+                this.todoList[index].completed ? this.counter++ : this.counter--;
                 this.forceUpdate();
             })
     }
@@ -174,13 +180,13 @@ export class TodoApp extends React.Component<any, any> {
 
     getFilteredTodos() {
         var filteredTodos = [];
-        for (var i = 0; i < this.collection.length; i++) {
+        for (var i = 0; i < this.todoList.length; i++) {
             if (
                 this.f === 'all' ||
-                (this.f === 'completed' && this.collection[i].completed) ||
-                (this.f === 'incomplete' && !this.collection[i].completed)
+                (this.f === 'completed' && this.todoList[i].completed) ||
+                (this.f === 'incomplete' && !this.todoList[i].completed)
             ) {
-                filteredTodos.push(this.collection[i]);
+                filteredTodos.push(this.todoList[i]);
             }
         }
         return filteredTodos;
