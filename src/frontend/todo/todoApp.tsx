@@ -272,36 +272,42 @@ export class TodoApp extends React.Component {
           </button>
         </div>
         {todosToShow.map((todo, index) =>
-          this.todoItem(
-            index,
-            todo,
-            this.todoUpdatingStatus,
-            this.handleUpdateTextChange,
-            this.onEdit,
-            this.toggleComplete,
-            this.deleteTodo,
-            this.updateTodo
-          )
+          <TodoItem
+            index={index}
+            todo={todo}
+            todoUpdatingStatuses={this.todoUpdatingStatus}
+            handleUpdateTextChange={this.handleUpdateTextChange}
+            onEdit={this.onEdit}
+            toggleComplete={this.toggleComplete}
+            deleteTodo={this.deleteTodo}
+            updateTodo={this.updateTodo}
+          />
+          
         )}
       </div>
     );
   }
+}
 
-  private todoItem(
-    index: number,
-    todo: Todo,
-    todoUpdatingStatuses: boolean[],
-    handleUpdateTextChange: (
-      event: React.ChangeEvent<HTMLInputElement>
-    ) => void,
-    onEdit: (index: number, text: string) => void,
-    toggleComplete: (index: number) => void,
-    deleteTodo: (index: number) => void,
-    updateTodo: (index: number) => void
+type TodoItemProps = {
+  index: number,
+  todo: Todo,
+  todoUpdatingStatuses: boolean[],
+  handleUpdateTextChange: (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => void,
+  onEdit: (index: number, text: string) => void,
+  toggleComplete: (index: number) => void,
+  deleteTodo: (index: number) => void,
+  updateTodo: (index: number) => void
+};
+
+function TodoItem(
+    { index, todo, todoUpdatingStatuses, handleUpdateTextChange, onEdit, toggleComplete, deleteTodo, updateTodo }: TodoItemProps
   ): React.JSX.Element {
     return (
       <div className="todo-list-item">
-        {this.todoUpdatingStatus[index] ? (
+        {todoUpdatingStatuses[index] ? (
           <input
             className="todo-edit-input"
             defaultValue={todo.text} // Asumiendo que inputData se usa para la edición
@@ -345,4 +351,3 @@ export class TodoApp extends React.Component {
       </div>
     );
   }
-}
