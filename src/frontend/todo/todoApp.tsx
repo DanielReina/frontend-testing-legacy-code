@@ -100,67 +100,59 @@ export class TodoApp extends React.Component {
   }
 
   updateTodo = (index) => {
-    const min = 3; // Longitud mínima del texto
-    const max = 100; // Longitud máxima del texto
-    const words = ["prohibited", "forbidden", "banned"];
+    const minLength = 3; // Longitud mínima del texto
+    const maxLength = 100; // Longitud máxima del texto
+    const forbiddenWords = ["prohibited", "forbidden", "banned"];
 
+    const hasValidLength =
+      this.updatedTodoText.length < minLength ||
+      this.updatedTodoText.length > maxLength;
     // Validación de longitud mínima y máxima
-    if (
-      this.updatedTodoText.length < min ||
-      this.updatedTodoText.length > max
-    ) {
+    if (hasValidLength) {
       alert(
-        `Error: The todo text must be between ${min} and ${max} characters long.`
+        `Error: The todo text must be between ${minLength} and ${maxLength} characters long.`
       );
-    } else if (/[^a-zA-Z0-9\s]/.test(this.updatedTodoText)) {
+      return;
+    }
+    const isValidText = /[^a-zA-Z0-9\s]/.test(this.updatedTodoText);
+    if (isValidText) {
       // Validación de caracteres especiales
       alert(
         "Error: The todo text can only contain letters, numbers, and spaces."
       );
-    } else {
-      // Validación de palabras prohibidas
-      let temp1 = false;
-      for (let word of this.updatedTodoText.split(/\s+/)) {
-        if (words.includes(word)) {
-          alert(
-            `Error: The todo text cannot include the prohibited word "${word}"`
-          );
-          temp1 = true;
-          break;
-        }
-      }
-
-      if (!temp1) {
-        // Validación de texto repetido (excluyendo el índice actual)
-        let temp2 = false;
-        for (let i = 0; i < this.todoList.length; i++) {
-          if (i !== index && this.todoList[i].text === this.updatedTodoText) {
-            temp2 = true;
-            break;
-          }
-        }
-
-        if (temp2) {
-          alert("Error: The todo text is already in the collection.");
-        } else {
-          // Si pasa todas las validaciones, actualizar el "todo"
-          fetch(`http://localhost:3000/api/todos/${this.todoList[index].id}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              text: this.updatedTodoText,
-              completed: this.todoList[index].completed,
-            }),
-          })
-            .then((response) => response.json())
-            .then((data) => {
-              this.todoList[index] = data;
-              this.close(index);
-              this.forceUpdate();
-            });
-        }
-      }
+      return;
     }
+    // Validación de palabras prohibidas
+    let temp1 = false;
+    const words = this.updatedTodoText.split(/\s+/);
+    const hasForbiddenWrods = words.some((word) =>
+      forbiddenWords.includes(word)
+    );
+    if (hasForbiddenWrods) {
+      alert(`Error: The todo text cannot include the prohibited word`);
+      return;
+    }
+    this.todoList.forEach((todo: Todo): void => {
+      if (todo.text === this.updatedTodoText) {
+        alert("Error: The todo text is already in the collection.");
+        return;
+      }
+    });
+    // Si pasa todas las validaciones, actualizar el "todo"
+    fetch(`http://localhost:3000/api/todos/${this.todoList[index].id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        text: this.updatedTodoText,
+        completed: this.todoList[index].completed,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        this.todoList[index] = data;
+        this.close(index);
+        this.forceUpdate();
+      });
   };
 
   deleteTodo = (index) => {
@@ -272,7 +264,7 @@ export class TodoApp extends React.Component {
             Incomplete
           </button>
         </div>
-        {todosToShow.map((todo, index) =>
+        {todosToShow.map((todo, index) => (
           <TodoItem
             index={index}
             todo={todo}
@@ -283,11 +275,8 @@ export class TodoApp extends React.Component {
             deleteTodo={this.deleteTodo}
             updateTodo={this.updateTodo}
           />
-          
-        )}
+        ))}
       </div>
     );
   }
 }
-
-
