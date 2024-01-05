@@ -4,9 +4,6 @@ import { Todo } from "./todoApp";
 type TodoItemProps = {
   index: number;
   todo: Todo;
-  todoUpdatingStatuses: boolean[];
-  handleUpdateTextChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  onEdit: (index: number, text: string) => void;
   toggleComplete: (index: number) => void;
   deleteTodo: (index: number) => void;
   updateTodo: (index: number, todo:Todo, newText:string) => void;
@@ -17,16 +14,8 @@ type TodoItemState = {
     isEditing: boolean;
     };
 
-export function TodoItem({
-  index,
-  todo,
-  todoUpdatingStatuses,
-  handleUpdateTextChange,
-  onEdit,
-  toggleComplete,
-  deleteTodo,
-  updateTodo,
-}: TodoItemProps): React.JSX.Element {
+export function TodoItem({ index, todo, toggleComplete, deleteTodo, updateTodo }: TodoItemProps
+): React.JSX.Element {
     const [state, setState] = React.useState<TodoItemState>({
       newText: "",
       isEditing: false,
@@ -34,11 +23,10 @@ export function TodoItem({
     const handleTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
          
         setState({ ...state, newText: event.target.value });
-        handleUpdateTextChange(event);
+        
     }
     const handleEdit = () => {
         setState({ ...state, isEditing: true });
-        onEdit(index, todo.text);
     }
     const handleUpdate = () => {
         setState({ ...state, isEditing: false });
@@ -46,7 +34,7 @@ export function TodoItem({
     }
   return (
     <div className="todo-list-item">
-      {todoUpdatingStatuses[index] ? (
+      {state.isEditing ? (
         <input
           className="todo-edit-input"
           defaultValue={todo.text} // Asumiendo que inputData se usa para la edición
