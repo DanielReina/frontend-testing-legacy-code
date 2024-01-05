@@ -99,14 +99,14 @@ export class TodoApp extends React.Component {
     }
   }
 
-  updateTodo = (index) => {
+  updateTodo = (index:number, previousTodo:Todo, newText:string) => {
     const minLength = 3; // Longitud mínima del texto
     const maxLength = 100; // Longitud máxima del texto
     const forbiddenWords = ["prohibited", "forbidden", "banned"];
 
     const hasValidLength =
-      this.updatedTodoText.length < minLength ||
-      this.updatedTodoText.length > maxLength;
+      newText.length < minLength ||
+      newText.length > maxLength;
     // Validación de longitud mínima y máxima
     if (hasValidLength) {
       alert(
@@ -114,7 +114,7 @@ export class TodoApp extends React.Component {
       );
       return;
     }
-    const isValidText = /[^a-zA-Z0-9\s]/.test(this.updatedTodoText);
+    const isValidText = /[^a-zA-Z0-9\s]/.test(newText);
     if (isValidText) {
       // Validación de caracteres especiales
       alert(
@@ -124,7 +124,7 @@ export class TodoApp extends React.Component {
     }
     // Validación de palabras prohibidas
     let temp1 = false;
-    const words = this.updatedTodoText.split(/\s+/);
+    const words = newText.split(/\s+/);
     const hasForbiddenWrods = words.some((word) =>
       forbiddenWords.includes(word)
     );
@@ -133,7 +133,7 @@ export class TodoApp extends React.Component {
       return;
     }
     this.todoList.forEach((todo: Todo): void => {
-      if (todo.text === this.updatedTodoText) {
+      if (todo.text === newText) {
         alert("Error: The todo text is already in the collection.");
         return;
       }
@@ -143,7 +143,7 @@ export class TodoApp extends React.Component {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        text: this.updatedTodoText,
+        text: newText,
         completed: this.todoList[index].completed,
       }),
     })
