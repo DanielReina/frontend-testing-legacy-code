@@ -94,14 +94,13 @@ export class TodoApp extends React.Component {
     }
   }
 
-  updateTodo = (index:number, previousTodo:Todo, newText:string) => {
+  updateTodo = (index: number, previousTodo: Todo, newText: string) => {
     const minLength = 3; // Longitud mínima del texto
     const maxLength = 100; // Longitud máxima del texto
     const forbiddenWords = ["prohibited", "forbidden", "banned"];
 
     const hasValidLength =
-      newText.length < minLength ||
-      newText.length > maxLength;
+      newText.length < minLength || newText.length > maxLength;
     // Validación de longitud mínima y máxima
     if (hasValidLength) {
       alert(
